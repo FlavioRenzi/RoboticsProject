@@ -25,7 +25,7 @@ The whole project was implemented utilizing `ROS Noetic` on a `Linux Ubuntu 20.0
 ## ToDo
 - [ ] create launch file with parameter
 - [ ] compute real wheels speed from wheels position
-    - [*] custom message to pubblish the speed `WheelSpeed`  on topic `real_wheel_rpm`
+    - [x] custom message to pubblish the speed `WheelSpeed`  on topic `real_wheel_rpm`
 - [ ] compute kinematic to obtain the speed of the robot
     - [ ] publish speed on topic `cmd_vel` with a message of type `geometry_msgs/TwistStamped`
 - [ ] compute integration to obtain the position of the robot
@@ -34,7 +34,7 @@ The whole project was implemented utilizing `ROS Noetic` on a `Linux Ubuntu 20.0
     - [ ] publish speed on topic `odom` with a message of type `nav_msgs/Odometry`
     - [ ] Broadcast TF `odom->base_link`
 - [ ] compute inverse kineamtic from the speed of the robot to obtain the speed of the wheels
-    - [*] custom message to publish the speed `WheelSpeed` on topic `wheels_rpm` 
+    - [x] custom message to publish the speed `WheelSpeed` on topic `wheels_rpm` 
 - [ ] tune parameter
 - [ ] create a service to reset the position to a given one
 
