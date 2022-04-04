@@ -1,0 +1,7 @@
+<launch>
+    <!-- Set the initial pose of the robot -->
+    <param name="InitialX" type="double" value="0" />
+    <param name="InitialY" type="double" value="0" />
+    <param name="InitialTheta" type="double" value="0" />
+
+</launch>
