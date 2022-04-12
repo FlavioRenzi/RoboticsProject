@@ -11,19 +11,20 @@ private:
     ros::Publisher pub;
 
     ros::Time lastTime;
-
+    double lastTick[4];
     
 public:
     Pub_sub_encoder_parser(){
-        sub = n.subscribe("/wheel_state", 1, &Pub_sub_encoder_parser::calcSpeed, this);
+        sub = n.subscribe("/wheel_states", 1, &Pub_sub_encoder_parser::calcSpeed, this);
         pub = n.advertise<RoboticsProject::WheelSpeed>("/wheel_speed", 1);
 
         lastTime = ros::Time::now();
+        
     }
 
     void calcSpeed(const sensor_msgs::JointState &msg){
         double speed[4];
-        double tick[4];
+        
         double dt;
         ros::Time currentTime;
 
@@ -31,15 +32,16 @@ public:
         currentTime = msg.header.stamp;
         
         //Computes dt from last message
-        dt = (currentTime - lastTime).toSec();
+        dt = (lastTime - currentTime).toSec();
         
-        #define RATIO 2
+        #define RATIO 5.71428571429
         double adjTime = RATIO/dt;
 
         for(int i=0;i<4;i++){
-            speed[i] = msg.position[i]*adjTime;
+            speed[i] = (lastTick[i]-msg.position[i])*adjTime;
+            lastTick[i] = msg.position[i];
         }
-
+        lastTime = currentTime;
 
         RoboticsProject::WheelSpeed wheelSpeedMsg;
 
