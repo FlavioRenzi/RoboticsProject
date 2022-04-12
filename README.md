@@ -22,6 +22,9 @@ The whole project was implemented utilizing `ROS Noetic` on a `Linux Ubuntu 20.0
 > To see the complete requirements -> [Project presentation](Project1.pdf)
 
 
+## Diagrams
+![BlockDiagram](./BlockDiagram.drawio.svg)
+
 ## ToDo
 - [ ] create launch file with parameter
 - [ ] compute real wheels speed from wheels position
