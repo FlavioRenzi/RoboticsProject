@@ -41,7 +41,7 @@ public:
         dt = (lastTime - currentTime).toSec();
 
         
-        #define RATIO 5.71428571429
+        #define RATIO 10
         double adjTime = RATIO/dt;
 
         for(int i=0;i<4;i++){

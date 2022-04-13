@@ -1,4 +1,6 @@
 #include <ros/ros.h>
+#include "geometry_msgs/TwistStamped.h"
+#include "nav_msgs/Odometry.h"
 #include <sstream>
 
 class Pub_sub_odometry_core{
@@ -34,27 +36,28 @@ private:
     }
 
     void computeOdometry(const geometry_msgs::TwistStamped::ConstPtr &msg){
-        double vx, w, dt;
+        double vx, vy, w, dt;
         ros::Time currentTime;
 
         //Reads currentTime from message's header
-        currentTime = msg.header.stamp;
+        currentTime = msg->header.stamp;
 
         //Computes dt from last message
         dt = (currentTime - lastTime).toSec();
         //Computes reads linear and angular velocities from message
-        vx = msg.twist.linear.x;
-        w = msg.twist.angular.z;
+        vx = msg->twist.linear.x;
+        vy = msg->twist.linear.y;
+        w = msg->twist.angular.z;
 
         //Integration
         if(integrationType == 0) { //EULER
-            x += vx * cos(th) * dt;
-            y += vx * sin(th) * dt;
+            x += (vx * cos(th) + vy * sin(th)) * dt;
+            y += (vx * sin(th) + vy * cos(th)) * dt;
             th += w * dt;
         }
         else if(integrationType == 1){ //RUNGE-KUTTA
-            x += vx * cos(th + w * dt / 2) * dt;
-            y += vx * sin(th + w * dt / 2) * dt;
+            x += sqrt(vx*vx + vy*vy) * cos(th + w * dt / 2) * dt;
+            y += sqrt(vx*vx + vy*vy) * sin(th + w * dt / 2) * dt;
             th += w * dt;
         }
 
@@ -68,8 +71,7 @@ private:
     }
      void publishOdometry(double vx, double w, ros::Time currentTime){
         nav_msgs::Odometry odometry;
-        geometry_msgs::Quaternion odometryQuaternion = tf::createQuaternionMsgFromYaw(th);
-        project_1::CustomOdometry customOdometry;
+        //geometry_msgs::Quaternion odometryQuaternion = tf::createQuaternionMsgFromYaw(th);
 
         //set header
         odometry.header.stamp = currentTime;
@@ -78,15 +80,19 @@ private:
         odometry.pose.pose.position.x = x;
         odometry.pose.pose.position.y = y;
         odometry.pose.pose.position.z = 0.0;
-        odometry.pose.pose.orientation = odometryQuaternion;
+
+        odometry.pose.pose.orientation.x = 0;
+        odometry.pose.pose.orientation.y = 0;
+        odometry.pose.pose.orientation.z = th;
+        //odometry.pose.pose.orientation = odometryQuaternion;
         //set velocity
         odometry.child_frame_id = "baseLink";
         odometry.twist.twist.linear.x = vx;
-        odometry.twist.twist.linear.y = 0;
+        odometry.twist.twist.linear.y = 0; //todo
         odometry.twist.twist.angular.z = w;
 
         //publish custom odometry
-        /* customOdometry.odom = odometry;
+/*         customOdometry.odom = odometry;
         if(integrationType==0)
             customOdometry.method.data = "euler";
         else
