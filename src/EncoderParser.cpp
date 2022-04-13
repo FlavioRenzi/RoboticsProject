@@ -3,6 +3,8 @@
 #include "sensor_msgs/JointState.h"
 #include <sstream>
 
+#define DIMAVG 5
+
 class Pub_sub_encoder_parser{
 private:
     ros::NodeHandle n;
@@ -12,6 +14,10 @@ private:
 
     ros::Time lastTime;
     double lastTick[4];
+    RoboticsProject::WheelSpeed wheelSpeedMsg;
+
+    double oldSpeed[DIMAVG][4];
+    int counter = 0;
     
 public:
     Pub_sub_encoder_parser(){
@@ -33,17 +39,27 @@ public:
         
         //Computes dt from last message
         dt = (lastTime - currentTime).toSec();
+
         
         #define RATIO 5.71428571429
         double adjTime = RATIO/dt;
 
         for(int i=0;i<4;i++){
-            speed[i] = (lastTick[i]-msg.position[i])*adjTime;
+            //calc new speed
+            oldSpeed[counter % DIMAVG][i] = (lastTick[i]-msg.position[i])*adjTime;
+            //calc new avg
+            speed[i] = 0;
+            for(int x = 0; x<DIMAVG; x++){
+                speed[i] += oldSpeed[x][i];
+            }
+            speed[i] = speed[i]/DIMAVG;
+
             lastTick[i] = msg.position[i];
         }
+        counter++;
         lastTime = currentTime;
 
-        RoboticsProject::WheelSpeed wheelSpeedMsg;
+        
 
         //set header
         wheelSpeedMsg.header.stamp = currentTime;
