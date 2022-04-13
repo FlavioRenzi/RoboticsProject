@@ -7,24 +7,23 @@ private:
     ros::NodeHandle n;
     ros::Subscriber sub;
     ros::Publisher odom_pub;
-    ros::Publisher custom_pub;
-    ros::ServiceServer resetZeroService;
-    ros::ServiceServer resetGeneralService;
+    //ros::Publisher custom_pub;
+    //ros::ServiceServer resetZeroService;
+    //ros::ServiceServer resetGeneralService;
 
     ros::Time lastTime;
     double x,y,th;
-    tf::TransformBroadcaster odom_broadcaster;
+    // tf::TransformBroadcaster odom_broadcaster;
 
     int integrationType;
 
     public:
     Pub_sub_odometry_core() {
-        sub = n.subscribe("/twist", 1, &Pub_sub_odometry::computeOdometry, this);
+        sub = n.subscribe("/cmd_vel", 1, &Pub_sub_odometry_core::computeOdometry, this);
 
-        odom_pub = n.advertise<nav_msgs::Odometry>("/odometry", 1);
-        custom_pub = n.advertise<project_1::CustomOdometry>("/custom", 1);
-        resetZeroService = n.advertiseService("reset_zero" , &Pub_sub_odomentry_core::resetZero, this);
-        resetGeneralService = n.advertiseService("reset_general" , &Pub_sub_odometry_core::resetGeneral, this);
+        odom_pub = n.advertise<nav_msgs::Odometry>("/odom", 1);
+        //resetZeroService = n.advertiseService("reset_zero" , &Pub_sub_odomentry_core::resetZero, this);
+        //resetGeneralService = n.advertiseService("reset_general" , &Pub_sub_odometry_core::resetGeneral, this);
         lastTime = ros::Time::now();
 
         //Reads param from launch file
@@ -34,18 +33,18 @@ private:
         integrationType = 0;
     }
 
-    void computeOdometry(const geometry_msgs::TwistStamped::ConstPtr& msg){
+    void computeOdometry(const geometry_msgs::TwistStamped::ConstPtr &msg){
         double vx, w, dt;
         ros::Time currentTime;
 
         //Reads currentTime from message's header
-        currentTime = msg->header.stamp;
+        currentTime = msg.header.stamp;
 
         //Computes dt from last message
         dt = (currentTime - lastTime).toSec();
         //Computes reads linear and angular velocities from message
-        vx = msg->twist.linear.x;
-        w = msg->twist.angular.z;
+        vx = msg.twist.linear.x;
+        w = msg.twist.angular.z;
 
         //Integration
         if(integrationType == 0) { //EULER
@@ -60,7 +59,7 @@ private:
         }
 
         //Publish tf transformation
-        publishTfTransformation(currentTime);
+        //publishTfTransformation(currentTime);
         //Publish odometry message
         publishOdometry(vx, w, currentTime);
 
@@ -87,19 +86,19 @@ private:
         odometry.twist.twist.angular.z = w;
 
         //publish custom odometry
-        customOdometry.odom = odometry;
+        /* customOdometry.odom = odometry;
         if(integrationType==0)
             customOdometry.method.data = "euler";
         else
             customOdometry.method.data = "rk";
 
         custom_pub.publish(customOdometry);
-
+ */
         //publish odometry
         odom_pub.publish(odometry);
     }
 
-    void setIntegration(project_1::integrationConfig &config){
+/*     void setIntegration(project_1::integrationConfig &config){
         integrationType = config.integration;
     }
 
@@ -123,10 +122,10 @@ private:
         ROS_INFO("y reset to: %f", y);
         ROS_INFO("th reset to: %f", th);
         return true;
-    }
+    } */
 };
 int main(int argc, char **argv) {
-    ros::init(argc, argv, "Odomentrycore");
+    ros::init(argc, argv, "OdomentryCore");
     Pub_sub_odometry_core pubSubOdometry;
 
    // dynamic_reconfigure::Server<project_1::integrationConfig> server;
