@@ -2,6 +2,9 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "nav_msgs/Odometry.h"
 #include <sstream>
+#include <tf/transform_broadcaster.h>
+
+
 
 class Pub_sub_odometry_core{
 
@@ -15,7 +18,7 @@ private:
 
     ros::Time lastTime;
     double x,y,th;
-    // tf::TransformBroadcaster odom_broadcaster;
+    tf::TransformBroadcaster odom_broadcaster;
 
     int integrationType;
 
@@ -51,8 +54,8 @@ private:
 
         //Integration
         if(integrationType == 0) { //EULER
-            x += (vx * cos(th) + vy * sin(th)) * dt;
-            y += (vx * sin(th) + vy * cos(th)) * dt;
+            x += vx * dt;
+            y += vy * dt;
             th += w * dt;
         }
         else if(integrationType == 1){ //RUNGE-KUTTA
@@ -64,14 +67,14 @@ private:
         //Publish tf transformation
         //publishTfTransformation(currentTime);
         //Publish odometry message
-        publishOdometry(vx, w, currentTime);
+        publishOdometry(vx, vy, w, currentTime);
 
         //Updates last time
         lastTime= currentTime;
     }
-     void publishOdometry(double vx, double w, ros::Time currentTime){
+     void publishOdometry(double vx,double vy,  double w, ros::Time currentTime){
         nav_msgs::Odometry odometry;
-        //geometry_msgs::Quaternion odometryQuaternion = tf::createQuaternionMsgFromYaw(th);
+        geometry_msgs::Quaternion odometryQuaternion = tf::createQuaternionMsgFromYaw(th);
 
         //set header
         odometry.header.stamp = currentTime;
@@ -81,14 +84,11 @@ private:
         odometry.pose.pose.position.y = y;
         odometry.pose.pose.position.z = 0.0;
 
-        odometry.pose.pose.orientation.x = 0;
-        odometry.pose.pose.orientation.y = 0;
-        odometry.pose.pose.orientation.z = th;
-        //odometry.pose.pose.orientation = odometryQuaternion;
+        odometry.pose.pose.orientation = odometryQuaternion;
         //set velocity
         odometry.child_frame_id = "baseLink";
         odometry.twist.twist.linear.x = vx;
-        odometry.twist.twist.linear.y = 0; //todo
+        odometry.twist.twist.linear.y = vy; 
         odometry.twist.twist.angular.z = w;
 
         //publish custom odometry
@@ -100,8 +100,28 @@ private:
 
         custom_pub.publish(customOdometry);
  */
+        //Publish tf transformation
+        publishTfTransformation(currentTime);
         //publish odometry
         odom_pub.publish(odometry);
+    }
+
+    void publishTfTransformation(ros::Time currentTime){
+        geometry_msgs::TransformStamped odometryTransformation;
+        geometry_msgs::Quaternion odometryQuaternion = tf::createQuaternionMsgFromYaw(th);
+
+        //set header
+        odometryTransformation.header.stamp = currentTime;
+        odometryTransformation.header.frame_id = "world";
+        odometryTransformation.child_frame_id = "base_link";
+        //set transformation
+        odometryTransformation.transform.translation.x = x;
+        odometryTransformation.transform.translation.y = y;
+        odometryTransformation.transform.translation.z = 0;
+        odometryTransformation.transform.rotation = odometryQuaternion;
+
+        //publish transformation
+        odom_broadcaster.sendTransform(odometryTransformation);
     }
 
 /*     void setIntegration(project_1::integrationConfig &config){
