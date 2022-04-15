@@ -57,8 +57,7 @@ private:
         q.setRPY(0,0,th);
 
         odometry.header.stamp = currentTime;
-        odometry.header.frame_id = "odom";
-        odometry.child_frame_id = "world";
+        odometry.header.frame_id = "world";
         odometry.pose.pose.position.x = x;
         odometry.pose.pose.position.y = y;
         odometry.pose.pose.position.z = 0;
@@ -75,7 +74,7 @@ private:
         geometry_msgs::Quaternion odometryQuaternon2 = tf::createQuaternionMsgFromYaw(th);
 
         odometryTransformation.header.stamp = currentTime;
-        odometryTransformation.header.frame_id = "odom";
+        odometryTransformation.header.frame_id = "world";
         odometryTransformation.child_frame_id = "base_link";
         odometryTransformation.transform.translation.x = x;
         odometryTransformation.transform.translation.y = y;
