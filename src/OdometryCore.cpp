@@ -3,6 +3,9 @@
 #include "nav_msgs/Odometry.h"
 #include <sstream>
 #include <tf/transform_broadcaster.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <geometry_msgs/TransformStamped.h>
 
 
 
@@ -12,23 +15,18 @@ private:
     ros::NodeHandle n;
     ros::Subscriber sub;
     ros::Publisher odom_pub;
-    //ros::Publisher custom_pub;
-    //ros::ServiceServer resetZeroService;
-    //ros::ServiceServer resetGeneralService;
+    tf2_ros::TransformBroadcaster odom_broadcaster;
 
     ros::Time lastTime;
     double x,y,th;
-    tf::TransformBroadcaster odom_broadcaster;
+    
 
     int integrationType;
 
     public:
     Pub_sub_odometry_core() {
         sub = n.subscribe("/cmd_vel", 1, &Pub_sub_odometry_core::computeOdometry, this);
-
         odom_pub = n.advertise<nav_msgs::Odometry>("/odom", 1);
-        //resetZeroService = n.advertiseService("reset_zero" , &Pub_sub_odomentry_core::resetZero, this);
-        //resetGeneralService = n.advertiseService("reset_general" , &Pub_sub_odometry_core::resetGeneral, this);
         lastTime = ros::Time::now();
 
         //Reads param from launch file
@@ -39,90 +37,58 @@ private:
     }
 
     void computeOdometry(const geometry_msgs::TwistStamped::ConstPtr &msg){
-        double vx, vy, w, dt;
+        double vx, vy, vth, dt;
         ros::Time currentTime;
+
+        vx = msg->twist.linear.x;
+        vy = msg->twist.linear.y;
+        vth = msg->twist.angular.z;
 
         //Reads currentTime from message's header
         currentTime = msg->header.stamp;
-
-        //Computes dt from last message
         dt = (currentTime - lastTime).toSec();
-        //Computes reads linear and angular velocities from message
-        vx = msg->twist.linear.x;
-        vy = msg->twist.linear.y;
-        w = msg->twist.angular.z;
 
-        //Integration
-        if(integrationType == 0) { //EULER
-            x += vx * dt;
-            y += vy * dt;
-            th += w * dt;
-        }
-        else if(integrationType == 1){ //RUNGE-KUTTA
-            x += sqrt(vx*vx + vy*vy) * cos(th + w * dt / 2) * dt;
-            y += sqrt(vx*vx + vy*vy) * sin(th + w * dt / 2) * dt;
-            th += w * dt;
-        }
+        x += (vx * cos(th) - vy * sin(th)) * dt;
+        y += (vx * sin(th) + vy * cos(th)) * dt;
+        th += (vth * dt);
 
-        //Publish tf transformation
-        //publishTfTransformation(currentTime);
-        //Publish odometry message
-        publishOdometry(vx, vy, w, currentTime);
-
-        //Updates last time
-        lastTime= currentTime;
-    }
-     void publishOdometry(double vx,double vy,  double w, ros::Time currentTime){
         nav_msgs::Odometry odometry;
-        geometry_msgs::Quaternion odometryQuaternion = tf::createQuaternionMsgFromYaw(th);
+        tf2::Quaternion q;
+        q.setRPY(0,0,th);
 
-        //set header
         odometry.header.stamp = currentTime;
         odometry.header.frame_id = "odom";
-        //set pose
+        odometry.child_frame_id = "world";
         odometry.pose.pose.position.x = x;
         odometry.pose.pose.position.y = y;
-        odometry.pose.pose.position.z = 0.0;
+        odometry.pose.pose.position.z = 0;
+        odometry.pose.pose.orientation.z = q.z();
 
-        odometry.pose.pose.orientation = odometryQuaternion;
-        //set velocity
-        odometry.child_frame_id = "baseLink";
         odometry.twist.twist.linear.x = vx;
-        odometry.twist.twist.linear.y = vy; 
-        odometry.twist.twist.angular.z = w;
+        odometry.twist.twist.linear.y = vy;
+        odometry.twist.twist.linear.z = 0;
 
-        //publish custom odometry
-/*         customOdometry.odom = odometry;
-        if(integrationType==0)
-            customOdometry.method.data = "euler";
-        else
-            customOdometry.method.data = "rk";
+        odometry.twist.twist.angular.z = th;
 
-        custom_pub.publish(customOdometry);
- */
-        //Publish tf transformation
-        publishTfTransformation(currentTime);
-        //publish odometry
-        odom_pub.publish(odometry);
-    }
 
-    void publishTfTransformation(ros::Time currentTime){
         geometry_msgs::TransformStamped odometryTransformation;
-        geometry_msgs::Quaternion odometryQuaternion = tf::createQuaternionMsgFromYaw(th);
+        geometry_msgs::Quaternion odometryQuaternon2 = tf::createQuaternionMsgFromYaw(th);
 
-        //set header
         odometryTransformation.header.stamp = currentTime;
-        odometryTransformation.header.frame_id = "world";
+        odometryTransformation.header.frame_id = "odom";
         odometryTransformation.child_frame_id = "base_link";
-        //set transformation
         odometryTransformation.transform.translation.x = x;
         odometryTransformation.transform.translation.y = y;
         odometryTransformation.transform.translation.z = 0;
-        odometryTransformation.transform.rotation = odometryQuaternion;
 
-        //publish transformation
+        odometryTransformation.transform.rotation = odometryQuaternon2;
+
         odom_broadcaster.sendTransform(odometryTransformation);
+        odom_pub.publish(odometry);
+        
+        lastTime = currentTime;
     }
+
 
 /*     void setIntegration(project_1::integrationConfig &config){
         integrationType = config.integration;
