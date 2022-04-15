@@ -22,12 +22,13 @@ private:
     
 
     int integrationType;
+    int skip;
 
-    public:
+public:
     Pub_sub_odometry_core() {
         sub = n.subscribe("/cmd_vel", 1, &Pub_sub_odometry_core::computeOdometry, this);
         odom_pub = n.advertise<nav_msgs::Odometry>("/odom", 1);
-        lastTime = ros::Time::now();
+        skip = 0;
 
         //Reads param from launch file
         n.getParam("/InitialX", x);
@@ -39,53 +40,58 @@ private:
     void computeOdometry(const geometry_msgs::TwistStamped::ConstPtr &msg){
         double vx, vy, vth, dt;
         ros::Time currentTime;
-
-        vx = msg->twist.linear.x;
-        vy = msg->twist.linear.y;
-        vth = msg->twist.angular.z;
-
-        //Reads currentTime from message's header
         currentTime = msg->header.stamp;
-        dt = (currentTime - lastTime).toSec();
 
-        x += (vx * cos(th) - vy * sin(th)) * dt;
-        y += (vx * sin(th) + vy * cos(th)) * dt;
-        th += (vth * dt);
+        if(skip){
+            vx = msg->twist.linear.x;
+            vy = msg->twist.linear.y;
+            vth = msg->twist.angular.z;
 
-        nav_msgs::Odometry odometry;
-        tf2::Quaternion q;
-        q.setRPY(0,0,th);
+            //Reads currentTime from message's header
+            
+            dt = (currentTime - lastTime).toSec();
+            //std::cout << dt << std::endl;
 
-        odometry.header.stamp = currentTime;
-        odometry.header.frame_id = "world";
-        odometry.pose.pose.position.x = x;
-        odometry.pose.pose.position.y = y;
-        odometry.pose.pose.position.z = 0;
-        odometry.pose.pose.orientation.z = q.z();
+            x += (vx * cos(th) - vy * sin(th)) * dt;
+            y += (vx * sin(th) + vy * cos(th)) * dt;
+            th += (vth * dt);
 
-        odometry.twist.twist.linear.x = vx;
-        odometry.twist.twist.linear.y = vy;
-        odometry.twist.twist.linear.z = 0;
+            nav_msgs::Odometry odometry;
+            tf2::Quaternion q;
+            q.setRPY(0,0,th);
 
-        odometry.twist.twist.angular.z = th;
+            odometry.header.stamp = currentTime;
+            odometry.header.frame_id = "odom";
+            odometry.pose.pose.position.x = x;
+            odometry.pose.pose.position.y = y;
+            odometry.pose.pose.position.z = 0;
+            odometry.pose.pose.orientation.z = q.z();
 
+            odometry.child_frame_id = "baseLink";
 
-        geometry_msgs::TransformStamped odometryTransformation;
-        geometry_msgs::Quaternion odometryQuaternon2 = tf::createQuaternionMsgFromYaw(th);
+            odometry.twist.twist.linear.x = vx;
+            odometry.twist.twist.linear.y = vy;
+            odometry.twist.twist.linear.z = 0;
+            
+            odometry.twist.twist.angular.z = th;
 
-        odometryTransformation.header.stamp = currentTime;
-        odometryTransformation.header.frame_id = "world";
-        odometryTransformation.child_frame_id = "base_link";
-        odometryTransformation.transform.translation.x = x;
-        odometryTransformation.transform.translation.y = y;
-        odometryTransformation.transform.translation.z = 0;
+            geometry_msgs::TransformStamped odometryTransformation;
+            geometry_msgs::Quaternion odometryQuaternon2 = tf::createQuaternionMsgFromYaw(th);
 
-        odometryTransformation.transform.rotation = odometryQuaternon2;
+            odometryTransformation.header.stamp = currentTime;
+            odometryTransformation.header.frame_id = "odom";
+            odometryTransformation.child_frame_id = "base_link";
+            odometryTransformation.transform.translation.x = x;
+            odometryTransformation.transform.translation.y = y;
+            odometryTransformation.transform.translation.z = 0;
 
-        odom_broadcaster.sendTransform(odometryTransformation);
-        odom_pub.publish(odometry);
-        
+            odometryTransformation.transform.rotation = odometryQuaternon2;
+
+            odom_broadcaster.sendTransform(odometryTransformation);
+            odom_pub.publish(odometry);
+        }
         lastTime = currentTime;
+        skip = 1;
     }
 
 
