@@ -7,6 +7,12 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/TransformStamped.h>
 
+#include <dynamic_reconfigure/server.h>
+#include "RoboticsProject/parametersConfig.h"
+#include "RoboticsProject/reset.h"
+#include "RoboticsProject/reset_general.h"
+
+
 
 
 class Pub_sub_odometry_core{
@@ -16,6 +22,8 @@ private:
     ros::Subscriber sub;
     ros::Publisher odom_pub;
     tf2_ros::TransformBroadcaster odom_broadcaster;
+    ros::ServiceServer resetZeroService;
+    ros::ServiceServer resetGeneralService;
 
     ros::Time lastTime;
     double x,y,th;
@@ -29,6 +37,9 @@ public:
         sub = n.subscribe("/cmd_vel", 1, &Pub_sub_odometry_core::computeOdometry, this);
         odom_pub = n.advertise<nav_msgs::Odometry>("/odom", 1);
         skip = 0;
+
+        resetZeroService = n.advertiseService("reset_zero" , &Pub_sub_odometry_core::resetZero, this);
+        resetGeneralService = n.advertiseService("reset_general" , &Pub_sub_odometry_core::resetGeneral, this);
 
         //Reads param from launch file
         n.getParam("/InitialX", x);
@@ -52,9 +63,16 @@ public:
             dt = (currentTime - lastTime).toSec();
             //std::cout << dt << std::endl;
 
-            x += (vx * cos(th) - vy * sin(th)) * dt;
-            y += (vx * sin(th) + vy * cos(th)) * dt;
-            th += (vth * dt);
+            if(integrationType){//runge kutta
+                x += (vx * cos(th +  vth * dt / 2) - vy * sin(th +  vth * dt / 2)) * dt;
+                y += (vx * sin(th +  vth * dt / 2) + vy * cos(th +  vth * dt / 2)) * dt;
+                th += vth * dt;
+            }else{//euler
+                x += (vx * cos(th) - vy * sin(th)) * dt;
+                y += (vx * sin(th) + vy * cos(th)) * dt;
+                th += vth * dt;
+            }
+            
 
             nav_msgs::Odometry odometry;
             tf2::Quaternion q;
@@ -94,13 +112,12 @@ public:
         skip = 1;
     }
 
-
-/*     void setIntegration(project_1::integrationConfig &config){
+    void setIntegration(RoboticsProject::parameters &config){
         integrationType = config.integration;
     }
 
-    bool resetZero(project_1::reset::Request  &req,
-                   project_1::reset::Response &res)
+    bool resetZero(RoboticsProject::reset::Request  &req,
+                   RoboticsProject::reset::Response &res)
     {
         x = 0;
         y = 0;
@@ -109,8 +126,8 @@ public:
         return true;
     }
 
-    bool resetGeneral(project_1::reset_general::Request  &req,
-                      project_1::reset_general::Response &res)
+    bool resetGeneral(RoboticsProject::reset_general::Request  &req,
+                      RoboticsProject::reset_general::Response &res)
     {
         x = req.x;
         y = req.y;
@@ -119,17 +136,17 @@ public:
         ROS_INFO("y reset to: %f", y);
         ROS_INFO("th reset to: %f", th);
         return true;
-    } */
+    }
 };
 int main(int argc, char **argv) {
     ros::init(argc, argv, "OdomentryCore");
     Pub_sub_odometry_core pubSubOdometry;
 
-   // dynamic_reconfigure::Server<project_1::integrationConfig> server;
-   // dynamic_reconfigure::Server<project_1::integrationConfig>::CallbackType f;
+    dynamic_reconfigure::Server<RoboticsProject::parameters> server;
+    dynamic_reconfigure::Server<RoboticsProject::parameters>::CallbackType f;
 
- //   f = boost::bind(&Pub_sub_odometry_core::setIntegration, &pubSubOdometry, _1);
- //   server.setCallback(f);
+    f = boost::bind(&Pub_sub_odometry_core::setIntegration, &pubSubOdometry, _1);
+    server.setCallback(f);
 
     ros::spin();
     return 0;

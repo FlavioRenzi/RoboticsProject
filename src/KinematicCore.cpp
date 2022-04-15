@@ -32,9 +32,6 @@ public:
 
     void RigidBodyCalc(const RoboticsProject::WheelSpeed &msg){
 
-       
-        
-
         radiusAdj = radius/(4*60*5);
         double K[3][4] = {{1,1,1,1}, {-1,1,1,-1},{-1/(l1+l2), 1/(l1+l2), -1/(l1+l2), 1/(l1+l2)}};//to fix
         vx = (K[0][0]*msg.rpm_fl + K[0][1]*msg.rpm_fr + K[0][2]*msg.rpm_rl + K[0][3] * msg.rpm_rr)*radiusAdj;

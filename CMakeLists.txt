@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   tf
+  dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
@@ -55,11 +56,11 @@ add_message_files(
 )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+		FILES
+		reset.srv
+		reset_general.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -89,10 +90,9 @@ generate_messages(
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+generate_dynamic_reconfigure_options(
+	cfg/parameters.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -143,6 +143,9 @@ target_link_libraries(KinematicCore ${catkin_LIBRARIES})
 
 add_executable(OdometryCore src/OdometryCore.cpp)
 target_link_libraries(OdometryCore ${catkin_LIBRARIES})
+
+add_dependencies(OdometryCore ${PROJECT_NAME}_gencfg)
+add_dependencies(OdometryCore ${catkin_EXPORTED_TARGETS})
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
