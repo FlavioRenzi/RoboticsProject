@@ -26,19 +26,19 @@ The whole project was implemented utilizing `ROS Noetic` on a `Linux Ubuntu 20.0
 ![BlockDiagram](./BlockDiagram.drawio.svg)
 
 ## ToDo
-- [ ] create launch file with parameter
-- [ ] compute real wheels speed from wheels position
+- [x] create launch file with parameter
+- [x] compute real wheels speed from wheels position
     - [x] custom message to pubblish the speed `WheelSpeed`  on topic `real_wheel_rpm`
-- [ ] compute kinematic to obtain the speed of the robot
-    - [ ] publish speed on topic `cmd_vel` with a message of type `geometry_msgs/TwistStamped`
-- [ ] compute integration to obtain the position of the robot
-    - [ ] enumeration for the 2 integration methods
-    - [ ] add ROS parameter for initial position
-    - [ ] publish speed on topic `odom` with a message of type `nav_msgs/Odometry`
-    - [ ] Broadcast TF `odom->base_link`
+- [x] compute kinematic to obtain the speed of the robot
+    - [x] publish speed on topic `cmd_vel` with a message of type `geometry_msgs/TwistStamped`
+- [x] compute integration to obtain the position of the robot
+    - [x] enumeration for the 2 integration methods
+    - [x] add ROS parameter for initial position
+    - [x] publish speed on topic `odom` with a message of type `nav_msgs/Odometry`
+    - [x] Broadcast TF `odom->base_link`
 - [ ] compute inverse kineamtic from the speed of the robot to obtain the speed of the wheels
     - [x] custom message to publish the speed `WheelSpeed` on topic `wheels_rpm` 
 - [ ] tune parameter
-- [ ] create a service to reset the position to a given one
+- [x] create a service to reset the position to a given one
 
 
