@@ -112,7 +112,7 @@ public:
         skip = 1;
     }
 
-    void setIntegration(RoboticsProject::parameters &config){
+    void setIntegration(RoboticsProject::parametersConfig &config){
         integrationType = config.integration;
     }
 
@@ -142,8 +142,8 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "OdomentryCore");
     Pub_sub_odometry_core pubSubOdometry;
 
-    dynamic_reconfigure::Server<RoboticsProject::parameters> server;
-    dynamic_reconfigure::Server<RoboticsProject::parameters>::CallbackType f;
+    dynamic_reconfigure::Server<RoboticsProject::parametersConfig> server;
+    dynamic_reconfigure::Server<RoboticsProject::parametersConfig>::CallbackType f;
 
     f = boost::bind(&Pub_sub_odometry_core::setIntegration, &pubSubOdometry, _1);
     server.setCallback(f);
