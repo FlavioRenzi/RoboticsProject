@@ -13,6 +13,7 @@
     <node pkg="RoboticsProject" type="EncoderParser" name="EncoderParser"/>
     <node pkg="RoboticsProject" type="KinematicCore" name="KinematicCore"/>
     <node pkg="RoboticsProject" type="OdometryCore" name="OdometryCore" output="screen"/>
+    <node pkg="RoboticsProject" type="ReverseKinematicCore" name="ReverseKinematicCore"/>
 
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
 

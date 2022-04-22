@@ -146,6 +146,9 @@ target_link_libraries(OdometryCore ${catkin_LIBRARIES})
 
 add_dependencies(OdometryCore ${PROJECT_NAME}_gencfg)
 add_dependencies(OdometryCore ${catkin_EXPORTED_TARGETS})
+
+add_executable(ReverseKinematicCore src/ReverseKinematicCore.cpp)
+target_link_libraries(ReverseKinematicCore ${catkin_LIBRARIES})
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
