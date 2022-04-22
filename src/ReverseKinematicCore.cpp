@@ -20,8 +20,8 @@ private:
     
 public:
     Pub_sub_Revkinematic(){
-        sub = n.subscribe("/odom", 1, &Pub_sub_Revkinematic::RigidBodyInvCalc, this);
-        pub = n.advertise<RoboticsProject::WheelSpeed>("/wheel_speed_from_odom", 1);
+        sub = n.subscribe("/cmd_vel", 1, &Pub_sub_Revkinematic::RigidBodyInvCalc, this);
+        pub = n.advertise<RoboticsProject::WheelSpeed>("/wheel_speed_from_vel", 1);
 
         n.getParam("/Largh", l1);
         n.getParam("/Lungh", l2);
