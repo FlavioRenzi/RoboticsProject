@@ -119,8 +119,10 @@ public:
     bool resetZero(RoboticsProject::reset::Request  &req,
                    RoboticsProject::reset::Response &res)
     {
+        skip = 0;
         x = 0;
         y = 0;
+        th = 0;
         ROS_INFO("x reset to: %f", x);
         ROS_INFO("y reset to: %f", y);
         return true;
@@ -129,6 +131,7 @@ public:
     bool resetGeneral(RoboticsProject::reset_general::Request  &req,
                       RoboticsProject::reset_general::Response &res)
     {
+        skip = 0;
         x = req.x;
         y = req.y;
         th = req.th;

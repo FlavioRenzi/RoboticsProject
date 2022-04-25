@@ -38,15 +38,13 @@ public:
         currentTime = msg.header.stamp;
         
         //Computes dt from last message
-        dt = (lastTime - currentTime).toSec();
+        dt = (currentTime - lastTime).toSec();
 
-        
-        #define RATIO 10
-        double adjTime = RATIO/dt;
+        double adjTime = 60/(42*5*dt);
 
         for(int i=0;i<4;i++){
             //calc new speed
-            oldSpeed[counter % DIMAVG][i] = (lastTick[i]-msg.position[i])*adjTime;
+            oldSpeed[counter % DIMAVG][i] = (msg.position[i] - lastTick[i]) * adjTime;
             //calc new avg
             speed[i] = 0;
             for(int x = 0; x<DIMAVG; x++){
@@ -79,12 +77,6 @@ public:
 int main(int argc, char **argv) {
     ros::init(argc, argv, "EncoderParser");
     Pub_sub_encoder_parser encParser;
-
-    //dynamic_reconfigure::Server<project_1::integrationConfig> server;
-    //dynamic_reconfigure::Server<project_1::integrationConfig>::CallbackType f;
-
-    //f = boost::bind(&Pub_sub_odometry::setIntegration, &pubSubOdometry, _1);
-    //server.setCallback(f);
 
     ros::spin();
     return 0;

@@ -3,6 +3,7 @@
 #include "sensor_msgs/JointState.h"
 #include "geometry_msgs/TwistStamped.h"
 #include <sstream>
+#include <math.h>
 
 class Pub_sub_kinematic{
 private:
@@ -17,6 +18,7 @@ private:
     double l2;
     double vx, vy, wz;
     double radius, radiusAdj;
+    double K[3][4];
     
 public:
     Pub_sub_kinematic(){
@@ -26,14 +28,15 @@ public:
         n.getParam("/Largh", l1);
         n.getParam("/Lungh", l2);
         n.getParam("/WheelRad", radius);
-        
-        
+        double Kcopy[3][4] = {{1,1,1,1}, {-1,1,1,-1},{-1/(l1+l2), 1/(l1+l2), -1/(l1+l2), 1/(l1+l2)}};
+
+        std::copy(&Kcopy[0][0], &Kcopy[0][0] + 3 * 4, &K[0][0]); 
     }
 
     void RigidBodyCalc(const RoboticsProject::WheelSpeed &msg){
 
-        radiusAdj = radius/(4*60*5);
-        double K[3][4] = {{1,1,1,1}, {-1,1,1,-1},{-1/(l1+l2), 1/(l1+l2), -1/(l1+l2), 1/(l1+l2)}};//to fix
+        radiusAdj = 2*M_PI*radius/(4*60);
+        
         vx = (K[0][0]*msg.rpm_fl + K[0][1]*msg.rpm_fr + K[0][2]*msg.rpm_rl + K[0][3] * msg.rpm_rr)*radiusAdj;
         vy = (K[1][0]*msg.rpm_fl + K[1][1]*msg.rpm_fr + K[1][2]*msg.rpm_rl + K[1][3] * msg.rpm_rr)*radiusAdj;
         wz = (K[2][0]*msg.rpm_fl + K[2][1]*msg.rpm_fr + K[2][2]*msg.rpm_rl + K[2][3] * msg.rpm_rr)*radiusAdj;

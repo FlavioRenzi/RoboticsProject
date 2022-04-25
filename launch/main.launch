@@ -17,4 +17,5 @@
 
     <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure"/>
 
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find RoboticsProject)/rviz.rviz" />
 </launch>
