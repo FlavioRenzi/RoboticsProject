@@ -3,7 +3,6 @@
 #include "sensor_msgs/JointState.h"
 #include "geometry_msgs/TwistStamped.h"
 #include <sstream>
-#include <math.h>
 
 class Pub_sub_kinematic{
 private:

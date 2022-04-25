@@ -3,7 +3,7 @@
 #include "sensor_msgs/JointState.h"
 #include <sstream>
 
-#define DIMAVG 5
+#define DIMAVG 1
 
 class Pub_sub_encoder_parser{
 private:

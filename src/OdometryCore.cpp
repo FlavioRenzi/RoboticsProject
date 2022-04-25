@@ -60,7 +60,7 @@ public:
             //Reads currentTime from message's header
             
             double dt = (currentTime - lastTime).toSec();
-            //std::cout << dt << std::endl;
+            //std::cout << integrationType << std::endl;
 
             if(integrationType){//runge kutta
                 x += (vx * cos(th +  vth * dt / 2) - vy * sin(th +  vth * dt / 2)) * dt;

@@ -34,9 +34,9 @@ public:
 
         ros::Time currentTime;
 
-        double Krev[4][3] = {{1,1,-(l1+l2)}, {1,-1,(l1+l2)}, {1,-1,-(l1+l2)}, {1,1,(l1+l2)}};
+        double Krev[4][3] = {{1,-1,-(l1+l2)}, {1,1,(l1+l2)}, {1,1,-(l1+l2)}, {1,-1,(l1+l2)}};
 
-        double coeff = 60*5/radius;
+        double coeff = (60)/(radius*2*M_PI);
 
         vx = msg->twist.linear.x;
         vy = msg->twist.linear.y;
@@ -47,10 +47,10 @@ public:
         //wheelSpeedMsg.header.frame_id = "wspeed";
 
         //set velocity
-        wheelSpeedMsg.rpm_fl = (Krev[0][0]*vx + Krev[0][1]*vy + Krev[0][2]*wz);
-        wheelSpeedMsg.rpm_fr = (Krev[1][0]*vx + Krev[1][1]*vy + Krev[1][2]*wz);
-        wheelSpeedMsg.rpm_rl = (Krev[2][0]*vx + Krev[2][1]*vy + Krev[2][2]*wz);
-        wheelSpeedMsg.rpm_rr = (Krev[3][0]*vx + Krev[3][1]*vy + Krev[3][2]*wz);
+        wheelSpeedMsg.rpm_fl = (Krev[0][0]*vx + Krev[0][1]*vy + Krev[0][2]*wz)*coeff;
+        wheelSpeedMsg.rpm_fr = (Krev[1][0]*vx + Krev[1][1]*vy + Krev[1][2]*wz)*coeff;
+        wheelSpeedMsg.rpm_rl = (Krev[2][0]*vx + Krev[2][1]*vy + Krev[2][2]*wz)*coeff;
+        wheelSpeedMsg.rpm_rr = (Krev[3][0]*vx + Krev[3][1]*vy + Krev[3][2]*wz)*coeff;
 
         pub.publish(wheelSpeedMsg);
 
