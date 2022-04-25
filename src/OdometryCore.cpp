@@ -30,13 +30,13 @@ private:
     
 
     int integrationType;
-    int skip;
+    bool firstIteration;
 
 public:
     Pub_sub_odometry_core() {
         sub = n.subscribe("/cmd_vel", 1, &Pub_sub_odometry_core::computeOdometry, this);
         odom_pub = n.advertise<nav_msgs::Odometry>("/odom", 1);
-        skip = 0;
+        firstIteration = true;
 
         resetZeroService = n.advertiseService("reset_zero" , &Pub_sub_odometry_core::resetZero, this);
         resetGeneralService = n.advertiseService("reset_general" , &Pub_sub_odometry_core::resetGeneral, this);
@@ -49,18 +49,17 @@ public:
     }
 
     void computeOdometry(const geometry_msgs::TwistStamped::ConstPtr &msg){
-        double vx, vy, vth, dt;
-        ros::Time currentTime;
-        currentTime = msg->header.stamp;
+        
+        ros::Time currentTime = msg->header.stamp;
 
-        if(skip){
-            vx = msg->twist.linear.x;
-            vy = msg->twist.linear.y;
-            vth = msg->twist.angular.z;
+        if(!firstIteration){
+            double vx = msg->twist.linear.x;
+            double vy = msg->twist.linear.y;
+            double vth = msg->twist.angular.z;
 
             //Reads currentTime from message's header
             
-            dt = (currentTime - lastTime).toSec();
+            double dt = (currentTime - lastTime).toSec();
             //std::cout << dt << std::endl;
 
             if(integrationType){//runge kutta
@@ -109,7 +108,7 @@ public:
             odom_pub.publish(odometry);
         }
         lastTime = currentTime;
-        skip = 1;
+        firstIteration = false;
     }
 
     void setIntegration(RoboticsProject::parametersConfig &config){
@@ -119,7 +118,7 @@ public:
     bool resetZero(RoboticsProject::reset::Request  &req,
                    RoboticsProject::reset::Response &res)
     {
-        skip = 0;
+        firstIteration = true;
         x = 0;
         y = 0;
         th = 0;
@@ -131,7 +130,7 @@ public:
     bool resetGeneral(RoboticsProject::reset_general::Request  &req,
                       RoboticsProject::reset_general::Response &res)
     {
-        skip = 0;
+        firstIteration = true;
         x = req.x;
         y = req.y;
         th = req.th;
