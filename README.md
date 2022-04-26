@@ -40,9 +40,9 @@ this node is used to compute the odometry of the robot, to publish all the relat
 The node reads the messages published by KinematicCore node and, based on the value of the param "integration",
 it computes the odometry of the robot using Euler or Runge-Kutta integration. After this it publishes the odometry on a topic and publishes the tf transformation.
 For the integration type, the node uses the dynamic reconfigure to set the integration type; the default value is "Euler"
-and whenever the user changes the param a callback is executed, changing the value of the field "integrationType" of the class Pub_Sub_Odometry_core.
-The node exposes also two callbacks for the two services: "resetZero", that set the x and y positions to 0 when the user calls the service;
-and "resetGeneral", that set the pose of the robot equal to the value x, y and theta that the user passes when calls the service.
+and whenever the user changes the param a callback is executed, changing the value of the field "integrationType" of the class `Pub_Sub_Odometry_core`.
+The node exposes also two callbacks for the two services: `resetZero`, that set the x and y positions to 0 when the user calls the service;
+and `resetGeneral`, that set the pose of the robot equal to the value x, y and theta that the user passes when calls the service.
 The node read the initial pose of the robot from the params declared in the launch file and sets the x, y and theta of the robot.
 - ReverseKinematicCore: reads the speed of the robot and calculates the speed at wich each wheel needs to go to obtain that movement.
 
@@ -74,12 +74,14 @@ Our tf tree is composed of three transformation frames (world, odom and base_lin
 In this file you can also set the link between world and odom frame using static transformation.
 The provided command will run all the nodes specified in the launch file and a precofigured rviz to look at the robot movement.
 
-`roslaunch RoboticsProject main.launch`
+```console
+$ roslaunch RoboticsProject main.launch
+```
 
 ## ToDo
 - [x] create launch file with parameter
 - [x] compute real wheels speed from wheels position
-    - [x] custom message to pubblish the speed `WheelSpeed`  on topic `real_wheel_rpm`
+    - [x] custom message to pubblish the speed `WheelSpeed`  on topic `wheel_speed`
 - [x] compute kinematic to obtain the speed of the robot
     - [x] publish speed on topic `cmd_vel` with a message of type `geometry_msgs/TwistStamped`
 - [x] compute integration to obtain the position of the robot
@@ -91,6 +93,7 @@ The provided command will run all the nodes specified in the launch file and a p
     - [x] custom message to publish the speed `WheelSpeed` on topic `wheels_rpm` 
 - [x] tune parameter
 - [x] create a service to reset the position to a given one
-- [] fix name in the diagrams
+- [x] fix name in the diagrams
+- [ ] add reference material
 
 
