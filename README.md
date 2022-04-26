@@ -89,7 +89,7 @@ $ roslaunch RoboticsProject main.launch
     - [x] add ROS parameter for initial position
     - [x] publish speed on topic `odom` with a message of type `nav_msgs/Odometry`
     - [x] Broadcast TF `odom->base_link`
-- [ ] compute inverse kineamtic from the speed of the robot to obtain the speed of the wheels
+- [x] compute inverse kineamtic from the speed of the robot to obtain the speed of the wheels
     - [x] custom message to publish the speed `WheelSpeed` on topic `wheels_rpm` 
 - [x] tune parameter
 - [x] create a service to reset the position to a given one
