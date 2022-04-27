@@ -1,14 +1,13 @@
 <launch>
     <!-- Set the initial pose of the robot -->
-    <param name="InitialX" type="double" value="0" />
-    <param name="InitialY" type="double" value="0" />
-    <param name="InitialTheta" type="double" value="0" />
-
     <node pkg="tf2_ros" type="static_transform_publisher" name="worldToOdom" args="0 0 0 0 0 0 world odom" />
 
     <param name="Largh" type="double" value="0.169" />
     <param name="Lungh" type="double" value="0.2" />
     <param name="WheelRad" type="double" value="0.075" />
+    <param name="CPR" type="int" value="42" />
+    
+    <!-- <param name="dimAvg" type="int" value="4" /> -->
 
     <node pkg="RoboticsProject" type="EncoderParser" name="EncoderParser"/>
     <node pkg="RoboticsProject" type="KinematicCore" name="KinematicCore"/>

@@ -41,10 +41,9 @@ public:
         resetZeroService = n.advertiseService("reset_zero" , &Pub_sub_odometry_core::resetZero, this);
         resetGeneralService = n.advertiseService("reset_general" , &Pub_sub_odometry_core::resetGeneral, this);
 
-        //Reads param from launch file
-        n.getParam("/InitialX", x);
-        n.getParam("/InitialY", y);
-        n.getParam("/InitialTheta", th);
+        x = 0;
+        y = 0;
+        th = 0;
         integrationType = 0;
     }
 
@@ -56,12 +55,9 @@ public:
             double vx = msg->twist.linear.x;
             double vy = msg->twist.linear.y;
             double vth = msg->twist.angular.z;
-
-            //Reads currentTime from message's header
             
             double dt = (currentTime - lastTime).toSec();
-            //std::cout << integrationType << std::endl;
-
+        
             if(integrationType){//runge kutta
                 x += (vx * cos(th +  vth * dt / 2) - vy * sin(th +  vth * dt / 2)) * dt;
                 y += (vx * sin(th +  vth * dt / 2) + vy * cos(th +  vth * dt / 2)) * dt;
@@ -76,7 +72,6 @@ public:
             nav_msgs::Odometry odometry;
 
             geometry_msgs::TransformStamped odometryTransformation;
-            //geometry_msgs::Quaternion odometryQuaternon = tf::createQuaternionMsgFromYaw(th);
 
             tf2::Quaternion q;
             q.setRPY(0, 0, th);

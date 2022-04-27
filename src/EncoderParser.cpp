@@ -3,7 +3,6 @@
 #include "sensor_msgs/JointState.h"
 #include <sstream>
 
-#define DIMAVG 1
 
 class Pub_sub_encoder_parser{
 private:
@@ -15,8 +14,10 @@ private:
     ros::Time lastTime;
     double lastTick[4];
     RoboticsProject::WheelSpeed wheelSpeedMsg;
+    int CPR;
+    int dimAvg;
 
-    double oldSpeed[DIMAVG][4];
+    double **oldSpeed;
     int counter = 0;
     
 public:
@@ -25,7 +26,15 @@ public:
         pub = n.advertise<RoboticsProject::WheelSpeed>("/wheel_speed", 1);
 
         lastTime = ros::Time::now();
-        
+        n.getParam("/CPR", CPR);
+        if(!n.getParam("/dimAvg", dimAvg)){
+            dimAvg = 1;
+        }
+
+        oldSpeed = new double*[dimAvg];
+        for(int i = 0; i < 4;i++){
+            oldSpeed[i] = new double[4];
+        }
     }
 
     void calcSpeed(const sensor_msgs::JointState &msg){
@@ -40,17 +49,17 @@ public:
         //Computes dt from last message
         dt = (currentTime - lastTime).toSec();
 
-        double adjTime = 60/(42*5*dt);
+        double adjTime = 60/(CPR*5*dt);
 
         for(int i=0;i<4;i++){
             //calc new speed
-            oldSpeed[counter % DIMAVG][i] = (msg.position[i] - lastTick[i]) * adjTime;
+            oldSpeed[counter % dimAvg][i] = (msg.position[i] - lastTick[i]) * adjTime;
             //calc new avg
             speed[i] = 0;
-            for(int x = 0; x<DIMAVG; x++){
+            for(int x = 0; x<dimAvg; x++){
                 speed[i] += oldSpeed[x][i];
             }
-            speed[i] = speed[i]/DIMAVG;
+            speed[i] = speed[i]/dimAvg;
 
             lastTick[i] = msg.position[i];
         }
