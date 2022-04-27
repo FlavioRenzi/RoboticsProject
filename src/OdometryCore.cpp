@@ -74,15 +74,16 @@ public:
             
 
             nav_msgs::Odometry odometry;
-            tf2::Quaternion q;
-            q.setRPY(0,0,th);
+
+            geometry_msgs::TransformStamped odometryTransformation;
+            geometry_msgs::Quaternion odometryQuaternon = tf::createQuaternionMsgFromYaw(th);
 
             odometry.header.stamp = currentTime;
             odometry.header.frame_id = "odom";
             odometry.pose.pose.position.x = x;
             odometry.pose.pose.position.y = y;
             odometry.pose.pose.position.z = 0;
-            odometry.pose.pose.orientation.z = q.z();
+            odometry.pose.pose.orientation = odometryQuaternon;
 
             odometry.child_frame_id = "baseLink";
 
@@ -90,10 +91,9 @@ public:
             odometry.twist.twist.linear.y = vy;
             odometry.twist.twist.linear.z = 0;
             
-            odometry.twist.twist.angular.z = th;
+            odometry.twist.twist.angular.z = vth;
 
-            geometry_msgs::TransformStamped odometryTransformation;
-            geometry_msgs::Quaternion odometryQuaternon2 = tf::createQuaternionMsgFromYaw(th);
+            
 
             odometryTransformation.header.stamp = currentTime;
             odometryTransformation.header.frame_id = "odom";
@@ -102,7 +102,7 @@ public:
             odometryTransformation.transform.translation.y = y;
             odometryTransformation.transform.translation.z = 0;
 
-            odometryTransformation.transform.rotation = odometryQuaternon2;
+            odometryTransformation.transform.rotation = odometryQuaternon;
 
             odom_broadcaster.sendTransform(odometryTransformation);
             odom_pub.publish(odometry);
