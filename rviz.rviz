@@ -6,7 +6,9 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /TF1
+        - /TF1/Tree1
+        - /TF1/Tree1/world1
+        - /TF1/Tree1/world1/odom1
       Splitter Ratio: 0.5
     Tree Height: 665
   - Class: rviz/Selection
@@ -109,21 +111,21 @@ Visualization Manager:
           Color: 204; 51; 204
           Scale: 1
           Value: true
-        Value: true
+        Value: false
       Enabled: true
       Keep: 100
       Name: Odometry
       Position Tolerance: 0.10000000149011612
       Queue Size: 10
       Shape:
-        Alpha: 1
+        Alpha: 0.699999988079071
         Axes Length: 1
         Axes Radius: 0.10000000149011612
-        Color: 255; 25; 0
-        Head Length: 0.30000001192092896
-        Head Radius: 0.10000000149011612
-        Shaft Length: 1
-        Shaft Radius: 0.05000000074505806
+        Color: 114; 159; 207
+        Head Length: 0.10000000149011612
+        Head Radius: 0.05000000074505806
+        Shaft Length: 0.30000001192092896
+        Shaft Radius: 0.019999999552965164
         Value: Arrow
       Topic: /odom
       Unreliable: false
@@ -155,7 +157,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 0.09499997645616531
+      Angle: 0.04999997839331627
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -165,10 +167,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 151.53823852539062
+      Scale: 167.7713165283203
       Target Frame: <Fixed Frame>
-      X: 3.142512321472168
-      Y: -1.179664969444275
+      X: 1.367316722869873
+      Y: -1.3639858961105347
     Saved: ~
 Window Geometry:
   Displays:
