@@ -23,8 +23,8 @@ public:
         sub = n.subscribe("/cmd_vel", 1, &Pub_sub_Revkinematic::RigidBodyInvCalc, this);
         pub = n.advertise<RoboticsProject::WheelSpeed>("/wheels_rpm", 1);
 
-        n.getParam("/Largh", l1);
-        n.getParam("/Lungh", l2);
+        n.getParam("/Width", l1);
+        n.getParam("/Length", l2);
         n.getParam("/WheelRad", radius);
         
         

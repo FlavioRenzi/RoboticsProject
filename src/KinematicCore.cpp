@@ -24,8 +24,8 @@ public:
         sub = n.subscribe("/wheel_speed", 1, &Pub_sub_kinematic::RigidBodyCalc, this);
         pub = n.advertise<geometry_msgs::TwistStamped>("/cmd_vel", 1);
 
-        n.getParam("/Largh", l1);
-        n.getParam("/Lungh", l2);
+        n.getParam("/Width", l1);
+        n.getParam("/Length", l2);
         n.getParam("/WheelRad", radius);
         double Kcopy[3][4] = {{1,1,1,1}, {-1,1,1,-1},{-1/(l1+l2), 1/(l1+l2), -1/(l1+l2), 1/(l1+l2)}};
 

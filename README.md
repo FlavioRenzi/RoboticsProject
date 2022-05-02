@@ -51,8 +51,8 @@ The node read the initial pose of the robot from the params declared in the laun
 
 ## Parameters
 In the launch file there is the possibility to tune the parameters depending on the robot geometry:
-- Largh
-- Lungh
+- Width
+- Length
 - WheelRad
 - CPM
 
@@ -103,6 +103,6 @@ Robot](https://research.ijcaonline.org/volume113/number3/pxc3901586.pdf)<sup>[1]
 - [x] tune parameter
 - [x] create a service to reset the position to a given one
 - [x] fix name in the diagrams
-- [] add reference material
+- [x] add reference material
 
 

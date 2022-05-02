@@ -2,8 +2,8 @@
     <!-- Set the initial pose of the robot -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="worldToOdom" args="0 0 0 0 0 0 world odom" />
 
-    <param name="Largh" type="double" value="0.169" />
-    <param name="Lungh" type="double" value="0.2" />
+    <param name="Width" type="double" value="0.169" />
+    <param name="Length" type="double" value="0.2" />
     <param name="WheelRad" type="double" value="0.075" />
     <param name="CPR" type="int" value="42" />
     
