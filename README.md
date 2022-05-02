@@ -6,7 +6,8 @@ Politecnico di Milano - Accademic Year 2021-2022
 >* [__Flavio Renzi__](https://github.com/FlavioRenzi)
 >* [__Jaskaran Singh__](https://github.com/zJaska)
 
-The whole project was implemented utilizing `ROS Noetic` on a `Linux Ubuntu 20.04` machine.
+The whole project was implemented utilizing `ROS Noetic` on a `Linux Ubuntu 20.04` machine.<br>
+Tested also with `ROS Melodic` on a `Linux Ubuntu 18.04` machine.
 
 ## Goals
 - Compute odometry using appropriate kinematics:
@@ -33,8 +34,8 @@ The whole project was implemented utilizing `ROS Noetic` on a `Linux Ubuntu 20.0
 
 ## Nodes
 ![BlockDiagram](./BlockDiagram.drawio.svg)
-- EncoderParser: reads the tick from the encoder and compute the speed of each wheel publishing it in the custom message.
-- KinematicCore: reads the wheel speed and compute the kinematic of the robot in each axis.
+- EncoderParser: reads the tick from the encoder and compute the speed of each wheel in rpm publishing it in the custom message on topic `/wheel_speed`.
+- KinematicCore: reads the wheel speed and compute the kinematic of the robot in each axis publishing all in the topic `/cmd_vel`.
 - OdometryCore: 
 this node is used to compute the odometry of the robot, to publish all the related messages and to expose two services to set the position.
 The node reads the messages published by KinematicCore node and, based on the value of the param "integration",
@@ -53,13 +54,10 @@ In the launch file there is the possibility to tune the parameters depending on 
 - Largh
 - Lungh
 - WheelRad
+- CPM
 
-and to set the initial position:
-- InitialX
-- InitialY
-- InitialTheta
-
-without having to recompile the code.
+and to set the initial position using the static transformation without having to recompile the code.<br>
+There is also the parameter dimAvg that can be used to define the dimension of the moving average filter on the wheels speeds and if it is not set it default to 1 (filter disabled).
 
 ## TF tree
 Our tf tree is composed of three transformation frames (world, odom and base_link):
@@ -77,6 +75,17 @@ The provided command will run all the nodes specified in the launch file and a p
 ```console
 $ roslaunch RoboticsProject main.launch
 ```
+## Comment
+The main goal of the project compute the trajectory of the robot starting from the movement of the wheels.
+To do that we compute the speed of each wheel in rpm to compute the kinematic of the robot<sup>[1](#reference)</sup> to obtain the movement of the whole assembly. Having the speed of the robot we integrate using the 2 different method to obtain the position in each instant.
+Comparing it with the ground thruth position recordered from the cameras we can see an error increasing with time.
+This type of wheels generate a lot of forces on the joint and a littele flex of the wheels axes can make the robot move in an unexpected way<sup>[2](#reference)</sup>.
+This, joint with the fact that the wheel can have a little slippage for example in the direction change, can explain the the difference we can observe from the computed trajectory and the recorded one.
+
+## Reference
+- [Kinematic Model of a Four Mecanum Wheeled Mobile
+Robot](https://research.ijcaonline.org/volume113/number3/pxc3901586.pdf)<sup>[1]</sup>
+- [Motion Control and the Skidding of Mecanum-Wheel Vehicles](https://ijiset.com/vol5/v5s5/IJISET_V5_I05_10.pdf)<sup>[2]</sup>
 
 ## ToDo
 - [x] create launch file with parameter
@@ -94,6 +103,6 @@ $ roslaunch RoboticsProject main.launch
 - [x] tune parameter
 - [x] create a service to reset the position to a given one
 - [x] fix name in the diagrams
-- [ ] add reference material
+- [] add reference material
 
 
