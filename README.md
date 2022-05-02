@@ -75,12 +75,27 @@ The provided command will run all the nodes specified in the launch file and a p
 ```console
 $ roslaunch RoboticsProject main.launch
 ```
-## Comment
+## Services
+
+There are 2 services:
+- `/reset_general` : take 3 parameter to set the position
+- `/reset_zero` : reset the position to 0
+
+these services can be used with:
+
+```console
+$ rosservice call /reset_general x y th
+$ rosservice call /reset_zero
+```
+
+## Methodology
 The main goal of the project compute the trajectory of the robot starting from the movement of the wheels.
 To do that we compute the speed of each wheel in rpm to compute the kinematic of the robot<sup>[1](#reference)</sup> to obtain the movement of the whole assembly. Having the speed of the robot we integrate using the 2 different method to obtain the position in each instant.
 Comparing it with the ground thruth position recordered from the cameras we can see an error increasing with time.
 This type of wheels generate a lot of forces on the joint and a littele flex of the wheels axes can make the robot move in an unexpected way<sup>[2](#reference)</sup>.
-This, joint with the fact that the wheel can have a little slippage for example in the direction change, can explain the the difference we can observe from the computed trajectory and the recorded one.
+This, joint with the fact that the wheel can have a little slippage for example in the direction change, can explain the the difference we can observe from the computed trajectory and the recorded one.<br>
+The parameters were chosen by trial and error, modifying them and trying to reflect the bag data.
+
 
 ## Reference
 - [Kinematic Model of a Four Mecanum Wheeled Mobile
