@@ -141,7 +141,7 @@ add_dependencies(EncoderParser RoboticsProject_generate_messages_cpp)
 
 add_executable(KinematicCore src/KinematicCore.cpp)
 target_link_libraries(KinematicCore ${catkin_LIBRARIES})
-add_dependencies(EncoderParser RoboticsProject_generate_messages_cpp)
+add_dependencies(KinematicCore RoboticsProject_generate_messages_cpp)
 
 add_executable(OdometryCore src/OdometryCore.cpp)
 target_link_libraries(OdometryCore ${catkin_LIBRARIES})
@@ -151,7 +151,7 @@ add_dependencies(OdometryCore ${catkin_EXPORTED_TARGETS})
 
 add_executable(ReverseKinematicCore src/ReverseKinematicCore.cpp)
 target_link_libraries(ReverseKinematicCore ${catkin_LIBRARIES})
-add_dependencies(EncoderParser RoboticsProject_generate_messages_cpp)
+add_dependencies(ReverseKinematicCore RoboticsProject_generate_messages_cpp)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
